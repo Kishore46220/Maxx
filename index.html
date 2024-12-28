@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KISHOREMAXX AI Robot Server</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: black;
+      font-family: 'Arial', sans-serif;
+      color: white;
+      overflow: hidden;
+      background-image: url('images/background.jpg'); /* Add your image here */
+      background-size: cover; /* Ensure the background image covers the entire page */
+      background-position: center; /* Center the background image */
+      background-attachment: fixed; /* Keep the background image fixed during scrolling */
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      color: cyan;
+      margin-top: 20px;
+    }
+
+    .box {
+      margin: 20px auto;
+      width: 90%;
+      max-width: 500px;
+      border: 2px solid cyan;
+      border-radius: 10px;
+      text-align: center;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    .highlight {
+      color: cyan;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    .pink-box {
+      border: 2px solid hotpink;
+      color: hotpink;
+    }
+
+    #particle-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .telegram-box {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: white;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 15px;
+      text-align: center;
+      border-radius: 10px;
+      border: 2px solid cyan;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+
+    .telegram-box a {
+      text-decoration: none;
+      color: cyan;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particle-canvas"></canvas>
+  <h1>KISHOREMAXX AI ROBOT SERVER</h1>
+  <div class="box">
+    <p>Period Number:</p>
+    <p id="period-number" class="highlight"></p>
+  </div>
+  <div class="box">
+    <p>Count:</p>
+    <p id="countdown" class="highlight"></p>
+  </div>
+  <div class="box pink-box">
+    <p>WILL APPEAR HERE</p>
+    <p id="prediction" class="highlight"></p>
+  </div>
+  <div class="telegram-box">
+    <a href="https://t.me/+ORN5eQIQ6EkzMzhl" target="_blank">TELEGRAM</a>
+  </div>
+
+  <script>
+    // AI Prediction Logic
+    function generatePrediction() {
+      const randomNum = Math.floor(Math.random() * 10);
+      const isBig = randomNum >= 5; // Big: 5 to 9, Small: 0 to 4
+
+      // AI-style prediction using numbers and symbols
+      const prediction = {
+        number: randomNum,
+        category: isBig ? "Big" : "Small",
+        symbol: randomNum % 2 === 0 ? "♦️" : "💚", // Red for even, Green for odd
+      };
+
+      return prediction;
+    }
+
+    // Update Period Number and Countdown
+    function updateTimer() {
+      const now = new Date();
+      const startHour = 5;
+      const startMinute = 30;
+      const startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), startHour, startMinute);
+
+      let elapsedSeconds = Math.floor((now - startTime) / 1000);
+      if (elapsedSeconds < 0) elapsedSeconds = 0;
+
+      const totalPeriods = Math.floor(elapsedSeconds / 30);
+      const upcomingPeriod = totalPeriods + 1;
+      const formattedDate = now.toISOString().slice(0, 10).replace(/-/g, "");
+      const periodNumber = `${formattedDate}100005${String(upcomingPeriod).padStart(4, "0")}`;
+      document.getElementById("period-number").textContent = periodNumber;
+
+      const remainingSeconds = 30 - (elapsedSeconds % 30);
+      document.getElementById("countdown").textContent = `00:${String(remainingSeconds).padStart(2, "0")}`;
+
+      // Generate AI prediction at the start of a new 30-second period
+      if (remainingSeconds === 30) {
+        const { number, category, symbol } = generatePrediction();
+        document.getElementById("prediction").innerHTML = `${number} ➤ ${category} <span style="font-size: 1.5rem;">${symbol}</span>`;
+      }
+    }
+
+    setInterval(updateTimer, 1000);
+
+    // Particle Animation with Neon Blue
+    const canvas = document.getElementById("particle-canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const particles = [];
+    for (let i = 0; i < 100; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 3 + 1,
+        speedX: Math.random() * 2 - 1,
+        speedY: Math.random() * 2 - 1,
+      });
+    }
+
+    function drawParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (const particle of particles) {
+        particle.x += particle.speedX;
+        particle.y += particle.speedY;
+
+        if (particle.x < 0 || particle.x > canvas.width) particle.speedX *= -1;
+        if (particle.y < 0 || particle.y > canvas.height) particle.speedY *= -1;
+
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(0, 255, 255, 1)"; // Neon Blue Color
+        ctx.fill();
+
+        for (const other of particles) {
+          const distance = Math.sqrt((particle.x - other.x) ** 2 + (particle.y - other.y) ** 2);
+          if (distance < 100) {
+            ctx.beginPath();
+            ctx.moveTo(particle.x, particle.y);
+            ctx.lineTo(other.x, other.y);
+            ctx.strokeStyle = "rgba(0, 255, 255, 0.2)"; // Neon Blue Lines
+            ctx.stroke();
+          }
+        }
+      }
+
+      requestAnimationFrame(drawParticles);
+    }
+
+    drawParticles();
+  </script>
+</body>
+</html>
